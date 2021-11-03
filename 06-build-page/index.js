@@ -1,50 +1,40 @@
 const path = require("path");
 const fs = require("fs");
-const { readdir } = require("fs").promises;
 
 const url = path.join(__dirname, "project-dist");
+const componentUrl = path.join(__dirname, "components");
 const pathCss = path.join(__dirname, "project-dist", "style.css");
+const pathHtml = path.join(__dirname, "project-dist", "index.html");
+const pathTemplate = path.join(__dirname, "template.html");
 
 fs.promises.mkdir(url, { recursive: true });
-async function createHtml() {
-  const componentUrl = path.join(__dirname, "components");
-  const readableStream = fs.createReadStream(
-    path.join(__dirname, "template.html"),
-    "utf-8"
-  );
-  const files = await readdir(componentUrl, {
-    withFileTypes: true,
-  });
 
-  /*   const article = await fs.promises.readFile(
-    path.join(componentUrl, "articles.html")
-  );
-  const footer = await fs.promises.readFile(
-    path.join(componentUrl, "footer.html")
-  );
-  */
-  for (const file of files) {
-    let urlFile = path.join(__dirname, `secret-folder/${file.name}`);
-    const obj = path.parse(urlFile);
-    const fileText = await fs.promises.readFile(
-      path.join(componentUrl, file.name)
-    );
-    let tag = fileText.toString();
-    let text = "";
-    readableStream.on("data", (data) => {
-      data = data.toString();
-      /*   console.log(data.indexOf(`{{obj.name}}`)); */
+const readableStream = fs.createReadStream(pathTemplate);
+const writebleStream = fs.createWriteStream(pathHtml);
+
+readableStream.on("data", async (data) => {
+  const textHtml = await replace();
+  writebleStream.write(textHtml);
+  async function replace() {
+    let text = data.toString();
+    const files = await fs.promises.readdir(componentUrl, {
+      withFileTypes: true,
     });
+    for (const file of files) {
+      let urlFile = path.join(__dirname, `components/${file.name}`);
+      const component = await fs.promises.readFile(
+        path.join(componentUrl, file.name)
+      );
+      component.toString();
+      const obj = path.parse(urlFile);
+      text = text.replace(obj.name, component);
+      console.log(text);
+      text = text.replace("{{", "");
+      text = text.replace("}}", "");
+    }
+    return text;
   }
-
-  readableStream.on("end", async () => {
-    await fs.promises.writeFile(
-      path.join(__dirname, "project-dist", "index.html"),
-      text,
-      "utf8"
-    );
-  });
-}
+});
 
 async function createCss() {
   const pathBundle = path.join(__dirname, "project-dist", "style.css");
@@ -103,5 +93,4 @@ async function copyFile(urlCopy, urlCopied) {
 }
 
 createCss(pathCss);
-createHtml();
 copyFile(urlCopy, urlCopied);
