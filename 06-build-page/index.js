@@ -28,7 +28,6 @@ readableStream.on("data", async (data) => {
       component.toString();
       const obj = path.parse(urlFile);
       text = text.replace(obj.name, component);
-      console.log(text);
       text = text.replace("{{", "");
       text = text.replace("}}", "");
     }
