@@ -1,9 +1,10 @@
 const path = require("path");
 const fsPromises = require("fs").promises;
 
-async function copyFile() {
-  const urlCopy = path.join(__dirname, "files");
-  const urlCopied = path.join(__dirname, "files-copy");
+const urlCopy = path.join(__dirname, "files");
+const urlCopied = path.join(__dirname, "files-copy");
+
+async function copyFile(urlCopy, urlCopied) {
   try {
     fsPromises.mkdir(urlCopied, { recursive: true });
     const files = await fsPromises.readdir(urlCopy, {
@@ -18,6 +19,6 @@ async function copyFile() {
     console.error(err);
   }
 }
-copyFile();
+copyFile(urlCopy, urlCopied);
 
-/* module.exports = { copyFile }; */
+/* module.exports = copyFile; */

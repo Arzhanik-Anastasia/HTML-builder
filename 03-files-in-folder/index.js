@@ -8,18 +8,14 @@ let url = path.join(__dirname, `secret-folder`);
     const files = await readdir(url, {
       withFileTypes: true,
     });
-    console.log(files);
     for (const file of files)
       if (file.isFile()) {
-        url = path.join(__dirname, `secret-folder/${file.name}`); //строка
-        console.log(file.name);
-
-        const obj = path.parse(url); //обьект
+        url = path.join(__dirname, `secret-folder/${file.name}`);
+        const obj = path.parse(url);
+        console.log(url);
         await stat(url, async (err, stats) => {
           console.log(
-            `${obj.name} - ${obj.ext.slice(1)} - ${Math.round(
-              stats.size / 1024
-            )}kb`
+            `${obj.name} - ${obj.ext.slice(1)} - ${stats.size / 1024} kb`
           );
         });
       }

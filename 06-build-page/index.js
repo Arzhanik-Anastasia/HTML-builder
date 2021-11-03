@@ -1,8 +1,10 @@
 const path = require("path");
 const fs = require("fs");
+const { readdir } = require("fs").promises;
 
 const url = path.join(__dirname, "project-dist");
-const pathBundle = path.join(__dirname, "project-dist", "style.css");
+const pathCss = path.join(__dirname, "project-dist", "style.css");
+
 fs.promises.mkdir(url, { recursive: true });
 async function createHtml() {
   const componentUrl = path.join(__dirname, "components");
@@ -10,22 +12,31 @@ async function createHtml() {
     path.join(__dirname, "template.html"),
     "utf-8"
   );
-  const article = await fs.promises.readFile(
+  const files = await readdir(componentUrl, {
+    withFileTypes: true,
+  });
+
+  /*   const article = await fs.promises.readFile(
     path.join(componentUrl, "articles.html")
   );
   const footer = await fs.promises.readFile(
     path.join(componentUrl, "footer.html")
   );
-  const header = await fs.promises.readFile(
-    path.join(componentUrl, "header.html")
-  );
-  let text = "";
-  readableStream.on("data", (data) => {
-    data = data.toString();
-    text = data.replace("{{header}}", header);
-    text = text.replace("{{articles}}", article);
-    text = text.replace("{{footer}}", footer);
-  });
+  */
+  for (const file of files) {
+    let urlFile = path.join(__dirname, `secret-folder/${file.name}`);
+    const obj = path.parse(urlFile);
+    const fileText = await fs.promises.readFile(
+      path.join(componentUrl, file.name)
+    );
+    let tag = fileText.toString();
+    let text = "";
+    readableStream.on("data", (data) => {
+      data = data.toString();
+      /*   console.log(data.indexOf(`{{obj.name}}`)); */
+    });
+  }
+
   readableStream.on("end", async () => {
     await fs.promises.writeFile(
       path.join(__dirname, "project-dist", "index.html"),
@@ -78,13 +89,11 @@ async function copyFile(urlCopy, urlCopied) {
       withFileTypes: true,
     });
     files.forEach((file) => {
+      const pathFile = path.join(urlCopy, file.name);
+      const patchCopiedFile = path.join(urlCopied, file.name);
       if (file.isDirectory()) {
-        const pathFile = path.join(urlCopy, file.name);
-        const patchCopiedFile = path.join(urlCopied, file.name);
         copyFile(pathFile, patchCopiedFile);
       } else {
-        const pathFile = path.join(urlCopy, file.name);
-        const patchCopiedFile = path.join(urlCopied, file.name);
         fs.promises.copyFile(pathFile, patchCopiedFile);
       }
     });
@@ -93,6 +102,6 @@ async function copyFile(urlCopy, urlCopied) {
   }
 }
 
-createCss();
+createCss(pathCss);
 createHtml();
 copyFile(urlCopy, urlCopied);

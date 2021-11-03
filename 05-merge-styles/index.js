@@ -3,7 +3,7 @@ const fs = require("fs");
 
 const pathBundle = path.join(__dirname, "project-dist", "bundle.css");
 
-async function createBundle(pathBundle) {
+async function createBundleCss(pathBundle) {
   let urlCss = path.join(__dirname, "styles");
   const files = await fs.promises.readdir(urlCss, {
     withFileTypes: true,
@@ -23,7 +23,6 @@ function streamMergeRecursive(arrFilesCss = [], fileWriteStream) {
   if (!arrFilesCss.length) {
     return fileWriteStream.end();
   }
-  console.log(arrFilesCss);
   const currentFile = path.resolve(__dirname, "styles", arrFilesCss.shift());
   const currentReadStream = fs.createReadStream(currentFile);
   currentReadStream.pipe(fileWriteStream, { end: false });
@@ -35,6 +34,6 @@ function streamMergeRecursive(arrFilesCss = [], fileWriteStream) {
     fileWriteStream.close();
   });
 }
-createBundle(pathBundle);
+createBundleCss(pathBundle);
 
-module.exports = { createBundle };
+module.exports = { createBundleCss };
