@@ -6,7 +6,8 @@ const urlCopied = path.join(__dirname, "files-copy");
 
 async function copyFile(urlCopy, urlCopied) {
   try {
-    fsPromises.mkdir(urlCopied, { recursive: true });
+    await fsPromises.rm(urlCopied, { recursive: true, force: true });
+    await fsPromises.mkdir(urlCopied, { recursive: true });
     const files = await fsPromises.readdir(urlCopy, {
       withFileTypes: true,
     });

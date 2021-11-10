@@ -73,6 +73,7 @@ let urlCopied = path.join(__dirname, "project-dist", "assets");
 
 async function copyFile(urlCopy, urlCopied) {
   try {
+    await fs.promises.rm(urlCopied, { recursive: true, force: true });
     fs.promises.mkdir(urlCopied, { recursive: true });
     const files = await fs.promises.readdir(urlCopy, {
       withFileTypes: true,
