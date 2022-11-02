@@ -1,9 +1,11 @@
 const { stdout } = process;
-const fs = require("fs");
+const { fs, createWriteStream } = require("fs");
 const path = require("path");
 const readline = require("readline");
 
 stdout.write("Введите, ваш текст\n");
+
+const stream = createWriteStream(path.join(__dirname, "text.txt"));
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -14,13 +16,9 @@ rl.on("line", (line) => {
   if (line == "exit") {
     stdout.write("Пока");
     process.exit();
+  } else {
+    stream.write(`${line}\n`);
   }
-  writeToFile(line);
 });
 
-function writeToFile(text) {
-  fs.appendFile(path.join(__dirname, "text.txt"), `${text}\n`, (err) => {
-    if (err) throw err;
-  });
-}
 process.on("beforeExit", () => stdout.write("Пока"));
